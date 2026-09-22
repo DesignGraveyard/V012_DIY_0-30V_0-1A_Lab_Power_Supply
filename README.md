@@ -17,6 +17,10 @@ The video below shows the power supply in action, assembly tips, how to manage t
 
 <img src="lab_power_supply_connections.jpg" alt="Lab Power Supply" class="responsive-img">
 
+#  Offline LM317 calculator tool, including losses: 
+
+<img src="LM317_calculation_tool.jpg" alt="Lab Power Supply" class="responsive-img">
+
 
 # Files:  
   
