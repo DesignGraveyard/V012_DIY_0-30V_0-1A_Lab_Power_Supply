@@ -9,9 +9,14 @@ The video below shows the power supply in action, assembly tips, how to manage t
 
 [![Watch the video](https://img.youtube.com/vi/XR9e3-A5Q-0/0.jpg)](https://youtu.be/XR9e3-A5Q-0)
 
-# Schematic of the continuity tester:  
+# Schematic of the power supply
 
 <img src="Lab_power_supply_schematic.jpg" alt="Lab Power Supply" class="responsive-img">
+
+# PCB Connections of the power supply PCBA:  
+
+<img src="lab_power_supply_connections.jpg" alt="Lab Power Supply" class="responsive-img">
+
 
 # Files:  
   
