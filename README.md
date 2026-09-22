@@ -15,4 +15,8 @@ The video below shows the power supply in action, assembly tips, how to manage t
 
 # Files:  
   
-An LTSpice simulation of the circuit is included.  
+-PCB Gerber files to order the PCBs: (PCB_GERBER_V011_LM317_Lab_power_supply_0-30V.zip).  
+-KiCAD 10 Files: PCB source files to adapt the design.  
+-LTSpice simulation: Simulation file of the full power supply, all spice models included.  
+-LM317_calculator_TDG: An offline LM317 calculator tool including losses in the LM317.  
+
