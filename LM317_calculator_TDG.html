@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LM317 Calculator | The Design Graveyard</title>
+  
+  <!-- Favicon / Tab Icon -->
+  <link rel="icon" type="image/png" href="https://ico.bytecook.io/png/conduit.png" />
+
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --card-bg: #18181b;
+      --panel-bg: #27272a;
+      --yellow: #facc15;
+      --yellow-hover: #eab308;
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --border: #3f3f46;
+      --danger: #ef4444;
+      --success: #22c55e;
+      --info: #38bdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 1.5rem;
+    }
+
+    .container {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 820px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      border: 2px solid var(--yellow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    /* Channel Header */
+    .channel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .channel-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .channel-icon {
+      width: 24px;
+      height: 24px;
+      object-fit: contain;
+    }
+
+    .channel-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--yellow);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .channel-link {
+      color: var(--yellow);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.85rem;
+      background: rgba(250, 204, 21, 0.1);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      border: 1px solid var(--yellow);
+      transition: all 0.2s ease;
+    }
+
+    .channel-link:hover {
+      background: var(--yellow);
+      color: #000;
+    }
+
+    .tool-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* Top Grid: Inputs */
+    .panels-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+
+    /* Bottom Grid: Results + Schematic */
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: stretch;
+    }
+
+    @media (max-width: 700px) {
+      .panels-grid, .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+    }
+
+    .panel-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input[type="number"] {
+      background: #18181b;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="number"]:focus {
+      border-color: var(--yellow);
+    }
+
+    /* Potentiometer Slider & Sync Box */
+    .pot-control {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    input[type="range"] {
+      accent-color: var(--yellow);
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .pot-num {
+      width: 75px !important;
+      text-align: center;
+    }
+
+    /* Results Readout Panel */
+    .results-panel {
+      background: var(--panel-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 0.75rem;
+    }
+
+    .result-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 0.4rem;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .result-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .result-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .result-value {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--yellow);
+    }
+
+    /* Schematic Panel Container */
+    .schematic-panel {
+      background: #000000;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-height: 200px;
+    }
+
+    /* Schematic Canvas & Inner Elements */
+    .schematic {
+      position: relative;
+      width: 480px;
+      height: 250px;
+      color: #f4f4f5;
+      user-select: none;
+      transform: scale(0.72);
+      transform-origin: center center;
+    }
+
+    .wire {
+      position: absolute;
+      background: #f4f4f5;
+    }
+
+    .ic-lm317 {
+      position: absolute;
+      left: 150px;
+      top: 35px;
+      width: 120px;
+      height: 60px;
+      border: 2px solid #facc15;
+      background: #18181b;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(250, 204, 21, 0.15);
+    }
+
+    .ic-title {
+      font-size: 0.95rem;
+      font-weight: 800;
+      color: #facc15;
+      letter-spacing: 0.05em;
+    }
+
+    .pin-tag {
+      position: absolute;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #f4f4f5;
+    }
+
+    .pin-in-tag { left: 6px; top: 22px; }
+    .pin-out-tag { right: 6px; top: 22px; }
+    .pin-adj-tag { bottom: 4px; left: 50%; transform: translateX(-50%); }
+
+    .node {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #f4f4f5;
+      transform: translate(-50%, -50%);
+    }
+
+    .resistor-h {
+      position: absolute;
+      width: 50px;
+      height: 22px;
+      border: 2px solid #facc15;
+      background: #27272a;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #facc15;
+    }
+
+    .resistor-v {
+      position: absolute;
+      width: 22px;
+      height: 44px;
+      border: 2px solid #facc15;
+      background: #27272a;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #facc15;
+    }
+
+    .pot-arrow {
+      position: absolute;
+      left: 172px;
+      top: 187px;
+      width: 44px;
+      height: 2px;
+      background: #facc15;
+      transform: translate(50%, 50%) rotate(-30deg);
+      transform-origin: left center;
+    }
+
+    .pot-arrow::after {
+      content: '';
+      position: absolute;
+      right: -2px;
+      top: -4px;
+      width: 0;
+      height: 0;
+      border-left: 7px solid #facc15;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+
+    .gnd-symbol {
+      position: absolute;
+      left: 210px;
+      top: 215px;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .gnd-bar-1 { width: 18px; height: 2px; background: #f4f4f5; margin-top: 2px; }
+    .gnd-bar-2 { width: 12px; height: 2px; background: #f4f4f5; margin-top: 2px; }
+    .gnd-bar-3 { width: 6px; height: 2px; background: #f4f4f5; margin-top: 2px; }
+
+    .label {
+      position: absolute;
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .lbl-vin { left: 20px; top: 38px; color: #f4f4f5; }
+    .lbl-vout { right: 20px; top: 38px; color: #f4f4f5; }
+    .lbl-pot { left: 125px; top: 168px; color: #f4f4f5; font-size: 0.8rem; }
+
+    /* Single-line Status Banner */
+    .status-banner {
+      background: #18181b;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: all 0.2s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Channel Branding Header -->
+    <div class="channel-header">
+      <div class="channel-brand">
+        <img src="https://ico.bytecook.io/png/conduit.png" alt="Conduit Icon" class="channel-icon" />
+        <span class="channel-title">The Design Graveyard</span>
+      </div>
+      <a href="https://www.youtube.com/@TheDesignGraveyard" target="_blank" class="channel-link">Visit Channel ➔</a>
+    </div>
+
+    <div class="tool-title">LM317 Power & Voltage Calculator</div>
+
+    <!-- Input Controls Grid -->
+    <div class="panels-grid">
+      <!-- Circuit Parameters -->
+      <div class="panel">
+        <span class="panel-title">1. Circuit Parameters</span>
+        <div class="input-group">
+          <label for="vin">Input Voltage (Vin) [V]</label>
+          <input type="number" id="vin" value="15" step="0.1" min="0">
+        </div>
+        <div class="input-group">
+          <label for="r1">Resistor R1 [Ω]</label>
+          <input type="number" id="r1" value="240" step="1" min="1">
+        </div>
+        <div class="input-group">
+          <label for="rpot">Potentiometer Max [Ω]</label>
+          <input type="number" id="rpot" value="5000" step="10" min="0">
+        </div>
+      </div>
+
+      <!-- Load & Adjustment -->
+      <div class="panel">
+        <span class="panel-title">2. Regulation & Load</span>
+        <div class="input-group">
+          <label for="iout">Output Current (Iout) [mA]</label>
+          <input type="number" id="iout" value="100" step="1" min="0">
+        </div>
+        <div class="input-group">
+          <label>Potentiometer Position (%)</label>
+          <div class="pot-control">
+            <input type="range" id="potSlider" min="0" max="100" value="50" step="0.5">
+            <input type="number" id="potNum" class="pot-num" min="0" max="100" value="50" step="0.5">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section: Results (Left) & Schematic (Right) -->
+    <div class="bottom-grid">
+      <!-- Readout Results Panel -->
+      <div class="results-panel">
+        <div class="result-row">
+          <span class="result-label">Potentiometer Resistance:</span>
+          <span class="result-value" id="r2Val">0 Ω</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Output Voltage (Vout):</span>
+          <span class="result-value" id="voutVal">0 V</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">Voltage Drop (Vin - Vout):</span>
+          <span class="result-value" id="vdropVal">0 V</span>
+        </div>
+        <div class="result-row">
+          <span class="result-label">LM317 Power Dissipation (Pd):</span>
+          <span class="result-value" id="pdispVal">0 W</span>
+        </div>
+      </div>
+
+      <!-- Circuit Schematic Panel -->
+      <div class="schematic-panel">
+        <div class="schematic">
+          <span class="label lbl-vin">V<sub>in</sub></span>
+          <span class="label lbl-vout">V<sub>out</sub></span>
+          <span class="label lbl-pot">Potmeter</span>
+
+          <div class="node" style="left: 350px; top: 65px;"></div>
+          <div class="node" style="left: 210px; top: 125px;"></div>
+
+          <div class="wire" style="left: 20px; top: 64px; width: 130px; height: 2px;"></div>
+          <div class="wire" style="left: 270px; top: 64px; width: 190px; height: 2px;"></div>
+          <div class="wire" style="left: 349px; top: 65px; width: 2px; height: 60px;"></div>
+          <div class="wire" style="left: 210px; top: 124px; width: 140px; height: 2px;"></div>
+          <div class="wire" style="left: 209px; top: 95px; width: 2px; height: 30px;"></div>
+          <div class="wire" style="left: 209px; top: 125px; width: 2px; height: 30px;"></div>
+          <div class="wire" style="left: 209px; top: 199px; width: 2px; height: 16px;"></div>
+
+          <div class="ic-lm317">
+            <span class="pin-tag pin-in-tag">IN</span>
+            <span class="pin-tag pin-out-tag">OUT</span>
+            <span class="pin-tag pin-adj-tag">ADJ</span>
+            <span class="ic-title">LM317</span>
+          </div>
+
+          <div class="resistor-h" style="left: 255px; top: 114px;">R1</div>
+          <div class="resistor-v" style="left: 199px; top: 155px;">R2</div>
+          <div class="pot-arrow"></div>
+
+          <div class="gnd-symbol">
+            <div class="gnd-bar-1"></div>
+            <div class="gnd-bar-2"></div>
+            <div class="gnd-bar-3"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Single-Line Status Box -->
+    <div id="statusBanner" class="status-banner">No heatsink needed</div>
+  </div>
+
+  <script>
+    // Inputs & Readouts
+    const vinInput = document.getElementById('vin');
+    const r1Input = document.getElementById('r1');
+    const rpotInput = document.getElementById('rpot');
+    const potSlider = document.getElementById('potSlider');
+    const potNum = document.getElementById('potNum');
+    const ioutInput = document.getElementById('iout');
+
+    const r2Val = document.getElementById('r2Val');
+    const voutVal = document.getElementById('voutVal');
+    const vdropVal = document.getElementById('vdropVal');
+    const pdispVal = document.getElementById('pdispVal');
+    const statusBanner = document.getElementById('statusBanner');
+
+    // LM317 Constants
+    const VREF = 1.25; 
+    const IADJ = 0.00005; // ~50uA
+
+    function calculate() {
+      const vin = parseFloat(vinInput.value) || 0;
+      const r1 = parseFloat(r1Input.value) || 0;
+      const rpot = parseFloat(rpotInput.value) || 0;
+      const potPct = parseFloat(potSlider.value) || 0;
+      const ioutmA = parseFloat(ioutInput.value) || 0;
+      const iout = ioutmA / 1000;
+
+      if (r1 <= 0) {
+        r2Val.textContent = "0 Ω";
+        voutVal.textContent = "0 V";
+        vdropVal.textContent = "0 V";
+        pdispVal.textContent = "0 W";
+        statusBanner.textContent = "Invalid R1 value";
+        statusBanner.style.color = "var(--danger)";
+        statusBanner.style.borderColor = "var(--danger)";
+        return;
+      }
+
+      // 1. Potentiometer Resistance (R2)
+      const r2 = rpot * (potPct / 100);
+
+      // 2. Output Voltage: Vout = Vref * (1 + R2/R1) + (Iadj * R2)
+      const vout = (VREF * (1 + (r2 / r1))) + (IADJ * r2);
+
+      // 3. Voltage Drop
+      const vdrop = vin - vout;
+
+      // 4. Power Dissipation: Pd = (Vin - Vout) * Iout + (Vin * Iadj)
+      const pdis = (vdrop * iout) + (vin * IADJ);
+
+      // Update Outputs
+      r2Val.textContent = r2.toFixed(1) + " Ω";
+      voutVal.textContent = vout.toFixed(2) + " V";
+      vdropVal.textContent = vdrop.toFixed(2) + " V";
+      pdispVal.textContent = pdis.toFixed(2) + " W";
+
+      // Update Single-Line Status
+      evaluateStatus(vdrop, pdis);
+    }
+
+    function evaluateStatus(vdrop, pdis) {
+      if (vdrop < 3) {
+        statusBanner.textContent = "Dropout voltage warning - Vin too low";
+        statusBanner.style.color = "var(--danger)";
+        statusBanner.style.borderColor = "var(--danger)";
+      } else if (pdis > 15) {
+        statusBanner.textContent = "Power dissipation >15W: exceeds TO220 specs";
+        statusBanner.style.color = "var(--danger)";
+        statusBanner.style.borderColor = "var(--danger)";
+      } else if (pdis > 1.5) {
+        statusBanner.textContent = "Heatsink needed";
+        statusBanner.style.color = "var(--yellow)";
+        statusBanner.style.borderColor = "var(--yellow)";
+      } else if (pdis > 0.25) {
+        statusBanner.textContent = "Small heatsink needed";
+        statusBanner.style.color = "var(--info)";
+        statusBanner.style.borderColor = "var(--info)";
+      } else {
+        statusBanner.textContent = "No heatsink needed";
+        statusBanner.style.color = "var(--success)";
+        statusBanner.style.borderColor = "var(--success)";
+      }
+    }
+
+    // Synchronize slider & numeric box
+    potSlider.addEventListener('input', (e) => {
+      potNum.value = e.target.value;
+      calculate();
+    });
+
+    potNum.addEventListener('input', (e) => {
+      let val = parseFloat(e.target.value);
+      if (isNaN(val)) val = 0;
+      if (val < 0) val = 0;
+      if (val > 100) val = 100;
+      potSlider.value = val;
+      calculate();
+    });
+
+    // Event listeners for numerical inputs
+    [vinInput, r1Input, rpotInput, ioutInput].forEach(elem => {
+      elem.addEventListener('input', calculate);
+    });
+
+    // Initial calculation
+    calculate();
+  </script>
+
+</body>
+</html>
