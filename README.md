@@ -7,7 +7,7 @@ The video below shows the power supply in action, assembly tips, how to manage t
 
 # Check out the video:
 
-[![Watch the video](https://img.youtube.com/vi/XR9e3-A5Q-0/0.jpg)](https://youtu.be/XR9e3-A5Q-0)
+[![Watch the video](https://img.youtube.com/vi/TmOTqNCIk3g/0.jpg)](https://youtu.be/TmOTqNCIk3g)
 
 # Schematic of the power supply
 
